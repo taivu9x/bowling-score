@@ -348,13 +348,13 @@ describe('useScoring calculation', () => {
         result.current.updateScore('Player1', 7, 0, '6');
         result.current.updateScore('Player1', 7, 1, '/');
         result.current.updateScore('Player1', 8, 0, '5');
-        result.current.updateScore('Player1', 8, 1, '4');
+        result.current.updateScore('Player1', 8, 1, '3');
         result.current.updateScore('Player1', 9, 0, 'X');
         result.current.updateScore('Player1', 9, 1, '8');
         result.current.updateScore('Player1', 9, 2, '1');
       })
 
-      expect(result.current.calculateScore('Player1')).toBe(134);
+      expect(result.current.calculateScore('Player1')).toBe(133);
     })
   });
 }); 
