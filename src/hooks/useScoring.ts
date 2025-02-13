@@ -39,6 +39,10 @@ export const useScoring = () => {
   }, []);
 
   const getFrameScore = useCallback((frame: number, rolls: string[][]): number => {
+    if (!rolls?.[frame]) {
+      return 0;
+    }
+
     const [first, second, third] = rolls[frame] || ["", "", ""];
     const firstVal = getValueFromRoll(first);
     

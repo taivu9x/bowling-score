@@ -1,5 +1,12 @@
 import dynamic from 'next/dynamic'
+import { LoadingSpinner } from '../LoadingSpinner'
 
-const GameHistory = dynamic(() => import('./GameHistoryClient'), { ssr: false })
+const GameHistoryClient = dynamic(
+  () => import('./GameHistoryClient'),
+  { 
+    ssr: false,
+    loading: () => <LoadingSpinner />
+  }
+)
 
-export default GameHistory; 
+export default GameHistoryClient; 

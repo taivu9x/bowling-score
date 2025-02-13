@@ -3,55 +3,49 @@
 import { useState } from 'react';
 
 interface PlayerSetupProps {
-  players: string[];
-  onAddPlayer: (name: string) => void;
   onStartGame: () => void;
-  onDeletePlayer: (name: string) => void;
 }
 
-export const PlayerSetup = ({ players, onAddPlayer, onStartGame, onDeletePlayer }: PlayerSetupProps) => {
-  const [newPlayer, setNewPlayer] = useState("");
+export const PlayerSetup = ({ onStartGame }: PlayerSetupProps) => {
+  const [playerName, setPlayerName] = useState('');
+  const [players, setPlayers] = useState<string[]>([]);
+
   const handleAddPlayer = () => {
-    if (newPlayer.trim() && players.length < 5) {
-      onAddPlayer(newPlayer.trim());
-      setNewPlayer("");
+    if (playerName.trim()) {
+      setPlayers([...players, playerName.trim()]);
+      setPlayerName('');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto bg-gray-800 p-6 rounded-lg">
-      <h1 className="text-2xl font-bold mb-4">Bowling Score Tracker</h1>
-      <input
-        type="text"
-        value={newPlayer}
-        onChange={(e) => setNewPlayer(e.target.value)}
-        placeholder="Enter player name"
-        className="w-full p-2 rounded bg-gray-700 mb-2"
-      />
-      <button
-        onClick={handleAddPlayer}
-        className="w-full bg-blue-500 py-2 rounded mb-4 disabled:opacity-50"
-        disabled={players.length >= 5}
-      >
-        Add Player
-      </button>
-      <ul className="mb-4">
+    <div className="max-w-md mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4">Add Players</h2>
+      <div className="flex gap-2 mb-4">
+        <input
+          type="text"
+          value={playerName}
+          onChange={(e) => setPlayerName(e.target.value)}
+          className="flex-1 p-2 bg-gray-800 rounded"
+          placeholder="Player name"
+        />
+        <button
+          onClick={handleAddPlayer}
+          className="px-4 py-2 bg-blue-500 rounded"
+        >
+          Add
+        </button>
+      </div>
+      <div className="mb-4">
         {players.map((player, index) => (
-          <li key={index} className="p-2 bg-gray-700 rounded mb-2">
+          <div key={index} className="p-2 bg-gray-800 rounded mb-2">
             {player}
-            <button
-              onClick={() => onDeletePlayer(player)}
-              className="ml-2 text-red-500"
-            >
-              X
-            </button>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
       <button
         onClick={onStartGame}
-        className="w-full bg-green-500 py-2 rounded disabled:opacity-50"
         disabled={players.length === 0}
+        className="w-full px-4 py-2 bg-green-500 rounded disabled:opacity-50"
       >
         Start Game
       </button>

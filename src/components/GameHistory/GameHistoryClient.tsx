@@ -1,3 +1,5 @@
+'use client'
+
 import { Game } from '@/types/bowling';
 
 interface GameHistoryProps {
@@ -12,7 +14,7 @@ const GameHistoryClient = ({ games, onLoadGame }: GameHistoryProps) => {
   };
 
   return (
-    <div className="mt-4">
+    <div className="mt-4" suppressHydrationWarning>
       <h2 className="text-xl font-bold mb-2">Game History</h2>
       <div className="space-y-2">
         {games.map(game => (
@@ -21,7 +23,7 @@ const GameHistoryClient = ({ games, onLoadGame }: GameHistoryProps) => {
             className="p-4 bg-gray-800 rounded flex justify-between items-center"
           >
             <div>
-              <p className="font-bold">
+              <p className="font-bold" suppressHydrationWarning>
                 {formatDate(game.date)}
               </p>
               <p className="text-sm text-gray-400">

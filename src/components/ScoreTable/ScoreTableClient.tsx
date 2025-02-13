@@ -12,7 +12,7 @@ interface ScoreTableProps {
   onCompleteGame: () => void;
 }
 
-export const ScoreTable = ({ players, scores, onUpdateScore, calculateScore, getFrameScore, onCompleteGame }: ScoreTableProps) => {
+const ScoreTableClient = ({ players, scores, onUpdateScore, calculateScore, getFrameScore, onCompleteGame }: ScoreTableProps) => {
   // Cache frame scores for each player
   const playerFrameScores = useMemo(() => {
     return players.reduce((acc, player) => {
@@ -194,4 +194,6 @@ export const ScoreTable = ({ players, scores, onUpdateScore, calculateScore, get
       </button>
     </div>
   );
-}; 
+};
+
+export default ScoreTableClient;
