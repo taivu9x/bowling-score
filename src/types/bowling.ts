@@ -2,6 +2,14 @@ export type Roll = '' | 'X' | '/' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7
 export type Frame = [Roll, Roll] | [Roll, Roll, Roll];
 export type Scores = Record<string, Frame[]>;
 
+export interface Game {
+  id: string;
+  date: string;
+  players: string[];
+  scores: Scores;
+  completed: boolean;
+}
+
 export interface Player {
   name: string;
   frames: Frame[];

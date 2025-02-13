@@ -1,21 +1,22 @@
 'use client'
 
-import { Roll } from '@/types/bowling';
+import { Roll, Scores } from '@/types/bowling';
 import { useMemo } from 'react';
 
 interface ScoreTableProps {
   players: string[];
-  scores: { [key: string]: string[][] };
+  scores: Scores;
   onUpdateScore: (player: string, frame: number, index: number, value: Roll) => void;
   calculateScore: (player: string) => number;
   getFrameScore: (frame: number, rolls: string[][]) => number;
+  onCompleteGame: () => void;
 }
 
-export const ScoreTable = ({ players, scores, onUpdateScore, calculateScore, getFrameScore }: ScoreTableProps) => {
+export const ScoreTable = ({ players, scores, onUpdateScore, calculateScore, getFrameScore, onCompleteGame }: ScoreTableProps) => {
   // Cache frame scores for each player
   const playerFrameScores = useMemo(() => {
     return players.reduce((acc, player) => {
-      acc[player] = calculateScore(player);
+        acc[player] = calculateScore(player);
       return acc;
     }, {} as Record<string, number>);
   }, [players, calculateScore]);
@@ -185,6 +186,12 @@ export const ScoreTable = ({ players, scores, onUpdateScore, calculateScore, get
           ))}
         </tbody>
       </table>
+      <button
+        onClick={onCompleteGame}
+        className="mt-4 px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+      >
+        Complete Game
+      </button>
     </div>
   );
 }; 

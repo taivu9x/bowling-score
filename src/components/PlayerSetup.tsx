@@ -6,11 +6,11 @@ interface PlayerSetupProps {
   players: string[];
   onAddPlayer: (name: string) => void;
   onStartGame: () => void;
+  onDeletePlayer: (name: string) => void;
 }
 
-export const PlayerSetup = ({ players, onAddPlayer, onStartGame }: PlayerSetupProps) => {
+export const PlayerSetup = ({ players, onAddPlayer, onStartGame, onDeletePlayer }: PlayerSetupProps) => {
   const [newPlayer, setNewPlayer] = useState("");
-
   const handleAddPlayer = () => {
     if (newPlayer.trim() && players.length < 5) {
       onAddPlayer(newPlayer.trim());
@@ -39,6 +39,12 @@ export const PlayerSetup = ({ players, onAddPlayer, onStartGame }: PlayerSetupPr
         {players.map((player, index) => (
           <li key={index} className="p-2 bg-gray-700 rounded mb-2">
             {player}
+            <button
+              onClick={() => onDeletePlayer(player)}
+              className="ml-2 text-red-500"
+            >
+              X
+            </button>
           </li>
         ))}
       </ul>

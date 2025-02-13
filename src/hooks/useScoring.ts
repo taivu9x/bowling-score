@@ -2,13 +2,23 @@ import { useState, useCallback } from 'react';
 import { Roll, Frame, Scores } from '@/types/bowling';
 
 export const useScoring = () => {
-  const [scores, setScores] = useState<Scores>({});
-
+  const [scores, setScores] = useState<Scores>({})
+  const [players, setPlayers] = useState<string[]>([]);
   const addPlayerScore = (playerName: string) => {
+    setPlayers([...players, playerName]);
     setScores(prev => ({
       ...prev,
       [playerName]: Array(9).fill(['', ''] as Frame).concat([['', '', ''] as Frame])
     }));
+  };
+
+  const deletePlayerScore = (playerName: string) => {
+    setPlayers(prev => prev.filter(player => player !== playerName));
+    setScores(prev => {
+      const newScores = { ...prev };
+      delete newScores[playerName];
+      return newScores;
+    });
   };
 
   const updateScore = (player: string, frame: number, index: number, value: Roll) => {
@@ -75,11 +85,21 @@ export const useScoring = () => {
     return totalScore;
   }, [getFrameScore, scores]);
 
+  const resetScores = () => {
+    setScores({});
+    setPlayers([]);
+  }
+
   return {
     scores,
+    players,
     addPlayerScore,
     updateScore,
     calculateScore,
     getFrameScore,
+    setScores,
+    setPlayers,
+    resetScores,
+    deletePlayerScore
   };
 }; 
