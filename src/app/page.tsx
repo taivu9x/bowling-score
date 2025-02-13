@@ -9,7 +9,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [players, setPlayers] = useState<string[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
-  const { scores, addPlayerScore, updateScore, calculateScore } = useScoring();
+  const { scores, addPlayerScore, updateScore, calculateScore, getFrameScore } = useScoring();
 
   // Handle client-side mounting
   useEffect(() => {
@@ -49,6 +49,7 @@ export default function Home() {
               scores={scores}
               onUpdateScore={updateScore}
               calculateScore={calculateScore}
+              getFrameScore={getFrameScore}
             />
           </div>
         )}

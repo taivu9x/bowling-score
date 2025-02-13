@@ -1,34 +1,34 @@
-import { useState } from 'react';
-
-type Scores = { [key: string]: string[][] };
+import { useState, useCallback } from 'react';
+import { Roll, Frame, Scores } from '@/types/bowling';
 
 export const useScoring = () => {
   const [scores, setScores] = useState<Scores>({});
 
   const addPlayerScore = (playerName: string) => {
-    setScores((prevScores) => ({
-      ...prevScores,
-      [playerName]: Array(9).fill(["", ""]).concat([["", "", ""]]),
+    setScores(prev => ({
+      ...prev,
+      [playerName]: Array(9).fill(['', ''] as Frame).concat([['', '', ''] as Frame])
     }));
   };
 
-  const updateScore = (player: string, frame: number, index: number, value: string) => {
-    setScores((prev) => {
+  const updateScore = (player: string, frame: number, index: number, value: Roll) => {
+    setScores(prev => {
       const newScores = { ...prev };
       newScores[player] = [...newScores[player]];
-      newScores[player][frame] = [...newScores[player][frame]];
+      newScores[player][frame] = [...newScores[player][frame]] as Frame;
       newScores[player][frame][index] = value;
       return newScores;
     });
   };
 
-  const getValueFromRoll = (roll: string, previousRoll: number = 0): number => {
+  // Memoize the getValueFromRoll function
+  const getValueFromRoll = useCallback((roll: string, previousRoll: number = 0): number => {
     if (roll === "X") return 10;
     if (roll === "/") return 10 - previousRoll;
     return parseInt(roll) || 0;
-  };
+  }, []);
 
-  const getFrameScore = (frame: number, rolls: string[][]): number => {
+  const getFrameScore = useCallback((frame: number, rolls: string[][]): number => {
     const [first, second, third] = rolls[frame] || ["", "", ""];
     const firstVal = getValueFromRoll(first);
     
@@ -62,9 +62,9 @@ export const useScoring = () => {
     }
     
     return firstVal + getValueFromRoll(second, firstVal);
-  };
+  }, [getValueFromRoll]);
 
-  const calculateScore = (player: string) => {
+  const calculateScore = useCallback((player: string) => {
     let totalScore = 0;
     const playerScores = scores[player] || [];
     
@@ -73,12 +73,13 @@ export const useScoring = () => {
     }
     
     return totalScore;
-  };
+  }, [getFrameScore, scores]);
 
   return {
     scores,
     addPlayerScore,
     updateScore,
     calculateScore,
+    getFrameScore,
   };
 }; 
