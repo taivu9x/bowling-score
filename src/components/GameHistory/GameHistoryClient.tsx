@@ -1,7 +1,7 @@
 'use client'
 
 import { gameAPI } from '@/services/api';
-import { GameState } from '@/types/bowling';
+import { GameState, GameStatus } from '@/types/bowling';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -31,7 +31,7 @@ const GameHistoryClient = () => {
           >
             <div>
               <p className="font-bold" suppressHydrationWarning>
-                {game.gameId}
+                {game.gameId} {game.status === GameStatus.COMPLETED ? "(Completed)" : "(In Progress)"}
               </p>
               <p className="text-sm text-gray-400">
                 Players: {game.playerStates.map(player => player.name).join(', ')}

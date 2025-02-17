@@ -14,6 +14,7 @@ export default function Game() {
   const [game, setGame] = useState<GameState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   // Initial game load and WebSocket setup
   useEffect(() => {
@@ -23,15 +24,21 @@ export default function Game() {
         const gameData = await gameAPI.getGame(id as string);
         setGame(gameData);
 
-        // Setup WebSocket connection
-        wsService.connect(id as string, async (update) => {
-          if (update.type === 'gameUpdate') {
-            // fetch the game again
-            console.log('Game updated:', update);
-            const gameData = await gameAPI.getGame(id as string);
-            setGame(gameData);
-          }
-        });
+        // Only connect WebSocket if game is not completed
+        if (gameData.status !== GameStatus.COMPLETED) {
+          wsService.connect(id as string, async (update) => {
+            if (update.type === 'gameUpdate') {
+              const updatedGame = await gameAPI.getGame(id as string);
+              setGame(updatedGame);
+
+              // Disconnect WebSocket if game becomes completed
+              if (updatedGame.status === GameStatus.COMPLETED) {
+                wsService.disconnect();
+                setIsConnected(false);
+              }
+            }
+          }, () => setIsConnected(true), () => setIsConnected(false));
+        }
       } catch (err) {
         setError('Failed to load game');
         console.error('Error loading game:', err);
@@ -45,6 +52,7 @@ export default function Game() {
     // Cleanup WebSocket on unmount
     return () => {
       wsService.disconnect();
+      setIsConnected(false);
     };
   }, [id, router]);
 
@@ -130,13 +138,45 @@ export default function Game() {
     <main className="min-h-screen bg-gray-900 text-white p-4">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-4">Game {id}</h1>
-        {!wsService.isConnected() && (
-          <div className="text-yellow-500 mb-4">
-            Reconnecting to game...
+        
+        {/* Connection status indicator */}
+        {game?.status !== GameStatus.COMPLETED && (
+          <div className={`
+            inline-flex items-center px-4 py-2 rounded-full text-sm
+            ${isConnected 
+              ? 'bg-green-500/10 text-green-400' 
+              : 'bg-yellow-500/10 text-yellow-400'
+            }
+            mb-4 transition-colors duration-200
+          `}>
+            <div className={`
+              w-2 h-2 rounded-full mr-2
+              ${isConnected ? 'bg-green-400' : 'bg-yellow-400'}
+            `} />
+            {isConnected ? 'Connected' : 'Reconnecting...'}
           </div>
         )}
 
-        {game.status === GameStatus.IN_PROGRESS && (
+        {/* Game status specific rendering */}
+        {game?.status === GameStatus.COMPLETED && (
+          <div>
+            <div className="bg-green-500 text-white px-4 py-2 rounded mb-4">
+              Game Completed
+            </div>
+            <ScoreTable
+              game={game}
+              isReadOnly={true}
+            />
+            <button 
+              onClick={() => router.push('/')}
+              className="mt-4 bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+            >
+              Back to Home
+            </button>
+          </div>
+        )}
+
+        {game?.status === GameStatus.IN_PROGRESS && (
           <ScoreTable
             game={game}
             onCompleteGame={handleCompleteGame}
@@ -144,7 +184,7 @@ export default function Game() {
           />
         )}
 
-        {game.status === GameStatus.WAITING && (
+        {game?.status === GameStatus.WAITING && (
           <PlayerSetup
             game={game}
             onAddPlayer={handleAddPlayer}
@@ -152,8 +192,6 @@ export default function Game() {
             onStartGame={handleStartGame}
           />
         )}
-        
-        
       </div>
     </main>
   );

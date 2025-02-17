@@ -18,21 +18,23 @@ export class WebSocketService {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 3;
 
-  connect(gameId: string, onUpdate: (data: GameUpdate) => void) {
+  connect(gameId: string, onUpdate: (data: GameUpdate) => void, onConnect: () => void, onDisconnect: () => void) {
     this.gameId = gameId;
     this.onUpdateCallback = onUpdate;
     this.reconnectAttempts = 0;
     
-    this.establishConnection();
+    this.establishConnection(onConnect, onDisconnect);
   }
 
-  private establishConnection() {
+  private establishConnection(onConnect: () => void, onDisconnect: () => void) {
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001';
     this.ws = new WebSocket(wsUrl);
     console.log('WebSocket URL:', wsUrl);
+
     this.ws.onopen = () => {
       console.log('WebSocket connected');
       this.joinGame();
+      onConnect();
     };
 
     this.ws.onmessage = (event) => {
@@ -52,16 +54,17 @@ export class WebSocketService {
 
     this.ws.onclose = () => {
       console.log('WebSocket closed');
-      this.handleReconnect();
+      this.handleReconnect(onConnect, onDisconnect);
+      onDisconnect();
     };
   }
 
-  private handleReconnect() {
+  private handleReconnect(onConnect: () => void, onDisconnect: () => void) {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
       setTimeout(() => {
-        this.establishConnection();
+        this.establishConnection(onConnect, onDisconnect);
       }, 1000 * this.reconnectAttempts); // Exponential backoff
     }
   }
