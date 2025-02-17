@@ -1,23 +1,30 @@
 export type Roll = '' | 'X' | '/' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
-export type Frame = [Roll, Roll] | [Roll, Roll, Roll];
-export type Scores = Record<string, Frame[]>;
-
-export interface Game {
-  id: string;
-  date: string;
-  players: string[];
-  scores: Scores;
-  completed: boolean;
+export interface Frame {
+  rolls: number[];
+  score: number;
 }
-
-export interface Player {
+export interface PlayerState {
+  playerId: string;
   name: string;
   frames: Frame[];
-  totalScore: number;
+  score: number;
+  isComplete: boolean;
+}
+
+export enum GameStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  WAITING = 'WAITING',
 }
 
 export interface GameState {
-  players: Player[];
-  currentFrame: number;
-  isComplete: boolean;
-} 
+  gameId: string;
+  status: GameStatus;
+  playerStates: PlayerState[];
+  score: number;
+}
+
+export interface playerPayload {
+  playerId: string;
+  playerName?: string;
+}

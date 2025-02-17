@@ -1,33 +1,25 @@
 'use client'
 
 import GameHistory from "@/components/GameHistory";
-import { PlayerSetup } from "@/components/PlayerSetup";
-import { useGameManagement } from "@/hooks/useGameManagement";
+import { gameAPI } from "@/services/api";
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const router = useRouter();
-  const { games, startNewGame, loadGame } = useGameManagement();
-
   const handleStartGame = () => {
-    startNewGame([], {});
-    router.push('/game');
+    gameAPI.createGame().then((game) => {
+      router.push(`/${game.gameId}`);
+    });
   };
-
-  const handleLoadGame = (gameId: string) => {
-    loadGame(gameId);
-    router.push('/game');
-  };
+ 
 
   return (
     <main className="min-h-screen bg-gray-900 text-white p-4">
-      <PlayerSetup
-        onStartGame={handleStartGame}
-      />
-      <GameHistory 
-        games={games} 
-        onLoadGame={handleLoadGame}
-      />
+      <div className="flex flex-col gap-4">
+        <h1 className="text-2xl font-bold">Bowling Game</h1>
+        <button onClick={handleStartGame}>Start Game</button>
+      </div>
+      <GameHistory />
     </main>
   );
 }

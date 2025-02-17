@@ -1,18 +1,21 @@
 'use client'
 
+import { GameState } from '@/types/bowling';
 import { useState } from 'react';
 
 interface PlayerSetupProps {
+  game: GameState;
+  onAddPlayer: (playerId: string, playerName?: string) => void;
+  onRemovePlayer: (playerId: string) => void;
   onStartGame: () => void;
 }
 
-export const PlayerSetup = ({ onStartGame }: PlayerSetupProps) => {
+export const PlayerSetup = ({ game, onAddPlayer, onStartGame }: PlayerSetupProps) => {
   const [playerName, setPlayerName] = useState('');
-  const [players, setPlayers] = useState<string[]>([]);
 
   const handleAddPlayer = () => {
     if (playerName.trim()) {
-      setPlayers([...players, playerName.trim()]);
+      onAddPlayer(crypto.randomUUID(), playerName.trim());
       setPlayerName('');
     }
   };
@@ -36,15 +39,15 @@ export const PlayerSetup = ({ onStartGame }: PlayerSetupProps) => {
         </button>
       </div>
       <div className="mb-4">
-        {players.map((player, index) => (
-          <div key={index} className="p-2 bg-gray-800 rounded mb-2">
-            {player}
+        {game.playerStates.map((player) => (
+          <div key={player.playerId} className="p-2 bg-gray-800 rounded mb-2">
+            {player.name}
           </div>
         ))}
       </div>
       <button
         onClick={onStartGame}
-        disabled={players.length === 0}
+        disabled={game.playerStates.length === 0}
         className="w-full px-4 py-2 bg-green-500 rounded disabled:opacity-50"
       >
         Start Game

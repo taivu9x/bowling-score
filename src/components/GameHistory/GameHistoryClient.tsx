@@ -1,37 +1,44 @@
 'use client'
 
-import { Game } from '@/types/bowling';
+import { gameAPI } from '@/services/api';
+import { GameState } from '@/types/bowling';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-interface GameHistoryProps {
-  games: Game[];
-  onLoadGame: (gameId: string) => void;
-}
+const GameHistoryClient = () => {
+  const router = useRouter();
+  const [games, setGames] = useState<GameState[]>([]);
 
-const GameHistoryClient = ({ games, onLoadGame }: GameHistoryProps) => {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const handleLoadGame = (gameId: string) => {
+    router.push(`/${gameId}`);
   };
 
+  useEffect(() => {
+    gameAPI.getAllGames().then((games) => {
+      console.log(games);
+      setGames(games);
+    });
+  }, []);
+  
   return (
     <div className="mt-4" suppressHydrationWarning>
       <h2 className="text-xl font-bold mb-2">Game History</h2>
       <div className="space-y-2">
         {games.map(game => (
           <div 
-            key={game.id} 
+            key={game.gameId} 
             className="p-4 bg-gray-800 rounded flex justify-between items-center"
           >
             <div>
               <p className="font-bold" suppressHydrationWarning>
-                {formatDate(game.date)}
+                {game.gameId}
               </p>
               <p className="text-sm text-gray-400">
-                Players: {game.players.join(', ')}
+                Players: {game.playerStates.map(player => player.name).join(', ')}
               </p>
             </div>
             <button
-              onClick={() => onLoadGame(game.id)}
+              onClick={() => handleLoadGame(game.gameId)}
               className="px-4 py-2 bg-blue-500 rounded"
             >
               Load Game
